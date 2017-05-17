@@ -58,7 +58,7 @@
 <div class="container">
   <div class="row">
     <div class="col-lg-8 col-md-8 col-sm-12">
-      {% for post in blogpages %}
+      {% for post in posts %}
       {% with post=post.specific %}
       <div class="post-preview">
         <a href="{% pageurl post %}">
@@ -80,10 +80,19 @@
       {% endwith %}
       {% endfor %}
     </div>
+    <div class="blog_sidebar">
+      <div class="col-lg-4 col-md-4 col-sm-12">
+        <ul class="sidebar">
+          <h4>Tags</h4>
+          {% for tag in tags %}
+          {{ tag.tag }},
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
   </div>
   <hr>
 </div>
-
 <!-- Footer -->
 <footer>
   <div class="container">

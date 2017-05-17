@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django import forms
+from django.core.paginator import EmptyPage, Paginator, PageNotAnInteger
 from django.db import models
 from django.utils.safestring import mark_safe
 from modelcluster.fields import ParentalKey, ParentalManyToManyField
@@ -148,20 +149,37 @@ class BlogIndexPage(Page):
         index.SearchField('intro'),
     ]
 
-    def get_context(self, request):
-        # Update context to include only published posts, ordered by
-        # reverse-chron
-        context = super(BlogIndexPage, self).get_context(request)
-        blogpages = self.get_children().live().order_by('-first_published_at')
-        context['blogpages'] = blogpages
-        return context
+    @property
+    def posts(self):
+        # Get list of live blog pages that are descendants of this page
+        posts = Post.objects.live().descendant_of(self)
+        # Order by most recent date first
+        posts = posts.order_by('-date')
+        return posts
 
-    def main_image(self):
-        gallery_item = self.header_image.first()
-        if gallery_item:
-            return gallery_item.image
-        else:
-            return None
+    def get_context(self, request):
+        # Get blogs
+        posts = self.posts
+        tags = PostTag.objects.all()
+        # Filter by tag
+        tag = request.GET.get('tag')
+        if tag:
+            posts = posts.filter(tags__name=tag)
+            # Pagination
+        page = request.GET.get('page')
+        paginator = Paginator(posts, 10)  # Show 10 blogs per page
+        try:
+            posts = paginator.page(page)
+        except PageNotAnInteger:
+            posts = paginator.page(1)
+        except EmptyPage:
+            posts = paginator.page(paginator.num_pages)
+
+        # Update template context
+        context = super(BlogIndexPage, self).get_context(request)
+        context['posts'] = posts
+        context['tags'] = tags
+        return context
 
     api_fields = ['header_image', 'intro']
 
