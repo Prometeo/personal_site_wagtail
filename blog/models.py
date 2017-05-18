@@ -165,7 +165,7 @@ class BlogIndexPage(Page):
         tag = request.GET.get('tag')
         if tag:
             posts = posts.filter(tags__name=tag)
-            # Pagination
+        # Pagination
         page = request.GET.get('page')
         paginator = Paginator(posts, 10)  # Show 10 blogs per page
         try:

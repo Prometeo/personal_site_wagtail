@@ -58,6 +58,9 @@
 <div class="container">
   <div class="row">
     <div class="col-lg-8 col-md-8 col-sm-12">
+      {% if request.GET.tag|length %}
+      <h4>Showing posts tagged as {{ request.GET.tag }} <a href=" {% pageurl self %} ">Show all</a></h4>
+      {% endif %}
       {% for post in posts %}
       {% with post=post.specific %}
       <div class="post-preview">
@@ -85,7 +88,9 @@
         <ul class="sidebar">
           <h4>Tags</h4>
           {% for tag in tags %}
-          {{ tag.tag }},
+          <a href="?tag={{ tag.tag }}">
+            <i class="glyphicon glyphicon-tag"></i> {{ tag.tag }}
+          </a>
           {% endfor %}
         </ul>
       </div>
