@@ -161,8 +161,12 @@ class BlogIndexPage(Page):
         # Get blogs
         posts = self.posts
         tags = PostTag.objects.all()
+        categories = PostCategory.objects.all()
         # Filter by tag
         tag = request.GET.get('tag')
+        category = request.GET.get('category')
+        if category:
+            posts = posts.filter(categories__name=category)
         if tag:
             posts = posts.filter(tags__name=tag)
         # Pagination
@@ -178,6 +182,7 @@ class BlogIndexPage(Page):
         # Update template context
         context = super(BlogIndexPage, self).get_context(request)
         context['posts'] = posts
+        context['categories'] = categories
         context['tags'] = tags
         return context
 
@@ -226,20 +231,6 @@ class Post(Page):
         FieldPanel('intro'),
         StreamFieldPanel('body'),
     ]
-
-
-class PostTagIndexPage(Page):
-
-    def get_context(self, request):
-
-        # Filter by tag
-        tag = request.GET.get('tag')
-        posts = Post.objects.filter(tags__name=tag)
-
-        # Update template context
-        context = super(PostTagIndexPage, self).get_context(request)
-        context['posts'] = posts
-        return context
 
 
 @register_snippet

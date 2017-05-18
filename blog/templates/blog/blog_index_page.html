@@ -61,6 +61,9 @@
       {% if request.GET.tag|length %}
       <h4>Showing posts tagged as {{ request.GET.tag }} <a href=" {% pageurl self %} ">Show all</a></h4>
       {% endif %}
+      {% if request.GET.category|length %}
+      <h4>Showing posts with category {{ request.GET.category }} <a href=" {% pageurl self %} ">Show all</a></h4>
+      {% endif %}
       {% for post in posts %}
       {% with post=post.specific %}
       <div class="post-preview">
@@ -85,6 +88,14 @@
     </div>
     <div class="blog_sidebar">
       <div class="col-lg-4 col-md-4 col-sm-12">
+        <ul class="sidebar">
+          <h4>Categories</h4>
+          {% for category in categories %}
+          <a href="?category={{ category }}">
+            <i class="glyphicon glyphicon-asterisk"></i> {{ category }}
+          </a>
+          {% endfor %}
+        </ul>
         <ul class="sidebar">
           <h4>Tags</h4>
           {% for tag in tags %}
