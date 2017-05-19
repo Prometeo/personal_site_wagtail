@@ -52,6 +52,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'blog',
 ]
+# Add wagtail.contrib.wagtailsearchpromotions to INSTALLED_APPS
+# if we're on Wagtail 1.1 or later.
+# NB this is a quick-and-dirty version check that won't work with
+# full generality (double-digit versions, alpha/beta releases)
+from wagtail.wagtailcore import __version__
+if __version__.split('.') > ['1', '0']:
+    INSTALLED_APPS = list(INSTALLED_APPS) + \
+        ['wagtail.contrib.wagtailsearchpromotions']
+
 
 MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -138,6 +147,6 @@ MEDIA_URL = '/media/'
 
 WAGTAIL_SITE_NAME = "my_site"
 
-# Base URL to use when referring to full URLs within the Wagtail admin backend -
+# Base URL to use when referring to full URLs within the Wagtail admin backend
 # e.g. in notification emails. Don't include '/admin' or a trailing slash
 BASE_URL = 'http://example.com'

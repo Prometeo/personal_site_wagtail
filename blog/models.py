@@ -196,6 +196,20 @@ BlogIndexPage.content_panels = [
 ]
 
 
+class PostTagIndexPage(Page):
+
+    def get_context(self, request):
+
+        # Filter by tag
+        tag = request.GET.get('tag')
+        posts = Post.objects.filter(tags__name=tag)
+
+        # Update template context
+        context = super(PostTagIndexPage, self).get_context(request)
+        context['posts'] = posts
+        return context
+
+
 class PostTag(TaggedItemBase):
     content_object = ParentalKey('Post', related_name='tagged_items')
 

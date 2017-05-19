@@ -1,4 +1,6 @@
-{% extends "base.html" %} {% load static i18n wagtailuserbar %} {% load wagtailcore_tags wagtailimages_tags %} {% block body_class %}template-blogindexpage{% endblock %} {% block content %}
+{% extends "base.html" %}
+{% load static i18n wagtailuserbar %} {% load wagtailcore_tags wagtailimages_tags %} {% block body_class %}template-blogindexpage{% endblock %}
+{% block content %}
 <!-- Navigation -->
 <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
   <div class="container-fluid">
@@ -31,15 +33,15 @@
 </nav>
 <!-- Page Header -->
 <!-- Set your background image for this header on the line below. -->
-{% block header %} {% image self.header_image fill-1900x864 as header_image %}
+{% block header %} {% image blog.header_image fill-1900x864 as header_image %}
 <header class="intro-header" style="background-image: url('{{ header_image.url }}')">
   <div class="container">
     <div class="row">
       <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
         <div class="page-heading">
-          <h1>{{ page.title }}</h1>
+          <h1>{{ blog.title }}</h1>
           <hr class="small">
-          <span class="subheading">{{ page.intro }}</span>
+          <span class="subheading">{{ blog.intro }}</span>
         </div>
       </div>
     </div>
@@ -51,23 +53,32 @@
 <div class="container">
   <div class="row">
     <div class="col-lg-8 col-md-8 col-sm-12">
-      {% if request.GET.tag|length %}
-      <h4>Showing posts tagged as {{ request.GET.tag }} <a href=" {% pageurl self %} ">Show all</a></h4>
-      {% endif %} {% if request.GET.category|length %}
-      <h4>Showing posts with category {{ request.GET.category }} <a href=" {% pageurl self %} ">Show all</a></h4>
-      {% endif %} {% for post in posts %} {% with post=post.specific %}
-      <div class="post-preview">
-        <a href="{% pageurl post %}">
-          <h2 class="post-title">{{ post.title }}</h2>
-          <h3 class="post-subtitle">
-            {% if post.intro %} {{ post.intro|richtext }} {% else %} {{ post.body|richtext|truncatewords_html:20 }} {% endif %}
-          </h3>
-        </a>
-        <p class="post-meta">Posted by
-          <a href="#">{{ post.owner.get_full_name|default:page.owner }}</a> on {{ post.date|date:"N d, Y" }}
-        </p>
-      </div>
-      <hr> {% endwith %} {% endfor %}
+      Search results{% if request.GET.query %} for “{{ request.GET.query }}”{% endif %}
+      {% if search_picks %}
+      {% for pick in search_picks %}
+      <li>
+        <h4><a href="{% pageurl pick.page %}">{{ pick.page.title }}</a></h4>
+        <p>{{ pick.description }}</p>
+      </li>
+      {% endfor %}
+      {% endif %}
+      {% if search_results %}
+      <ul>
+        {% for result in search_results %}
+        <li>
+          <h4><a href="{% pageurl result.specific %}">{{ result.specific }}</a></h4>
+          {% if result.specific.search_description %}
+          {{ result.specific.search_description }}
+          {{ result.specific.search }}
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      {% elif search_query %}
+      No results found
+      {% else %}
+      You didn’t search anything!
+      {% endif %}
     </div>
     <div class="blog_sidebar">
       <div class="col-lg-4 col-md-4 col-sm-12">
@@ -78,22 +89,6 @@
               <button class="btn btn-default btn-sm" type="submit"><i class="fa fa-search"></i></button>
             </div>
           </form>
-        </ul>
-        <ul class="sidebar">
-          <h4>Categories</h4>
-          {% for category in categories %}
-          <a href="?category={{ category }}">
-            <i class="glyphicon glyphicon-asterisk"></i> {{ category }}
-          </a>
-          {% endfor %}
-        </ul>
-        <ul class="sidebar">
-          <h4>Tags</h4>
-          {% for tag in tags %}
-          <a href="?tag={{ tag.tag }}">
-            <i class="glyphicon glyphicon-tag"></i> {{ tag.tag }}
-          </a>
-          {% endfor %}
         </ul>
       </div>
     </div>
@@ -136,4 +131,5 @@
     </div>
   </div>
 </footer>
+
 {% endblock %}
